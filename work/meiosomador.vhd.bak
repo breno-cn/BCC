@@ -2,12 +2,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity meiosomador is 
-  port{
+  port(
     a : IN std_logic;
     b : IN std_logic;
     s : OUT std_logic;
     c : OUT std_logic
-    };
+    );
     
 end entity meiosomador;
 
