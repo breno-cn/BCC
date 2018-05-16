@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity somadorcompleto is
   port(
     a    : IN std_logic;
-    b    : in std_logic;
+    b    : IN std_logic;
     cin  : IN std_logic;
     s    : OUT std_logic;
     cout : OUT std_logic
