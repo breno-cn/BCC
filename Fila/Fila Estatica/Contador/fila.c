@@ -9,7 +9,6 @@ struct Fila{
 fila cria_fila(){
 	fila f=(fila)malloc(sizeof(struct Fila));
 	if(f!=NULL) f->ini=f->cont=0;
-	// printf("Inicio: %d\nCont: %d\n", f->ini, f->cont);
 	return f;
 }
   
