@@ -56,9 +56,9 @@ int dec_bin(int x, char *string){
 	pilha p=cria_pilha();
 	while(x>=1){
 		push(&p,x%2);
-		x/=2;
+		x=x>>1;
 	}
-	char s[30];
+	char s[100];
 	for(int i=0;!pilha_vazia(p);i++){
 		pop(&p,&x);
 		s[i]=x+'0';
@@ -67,7 +67,7 @@ int dec_bin(int x, char *string){
 	return 1;
 }
 
-int escopo_valido(char *s){
+int escopo_valido(const char *s){
 	if(s==NULL) return 0;
 	pilha p=cria_pilha();
 	int x;
@@ -76,21 +76,49 @@ int escopo_valido(char *s){
 			push(&p,s[i]);
 		}
 		if(s[i]==')'){
-			if(pilha_vazia(p)) return false;
-			pop(&p,&x);
+			if(!pop(&p,&x)) return false;
 			if(x!='(') return false;
 		}
 		if(s[i]==']'){
-			if(pilha_vazia(p)) return false;
-			pop(&p,&x);
+			if(!pop(&p,&x)) return false;
 			if(x!='[') return false;
 		}
 		if(s[i]=='}'){
-			if(pilha_vazia(p)) return false;
-			pop(&p,&x);
+			if(!pop(&p,&x)) return false;
 			if(x!='{') return false;
 		}
 	}
 	if(pilha_vazia(p)) return true;
 	else return false;
+}
+
+int infixa_posfixa(const char *inf, char *pos){
+	if(inf==NULL || pos==NULL) return 0;
+	int x,j=0;
+	pilha p=cria_pilha();
+	for(int i=0;inf[i]!='\0';i++){
+        if(inf[i]==')'){
+			if(!pop(&p,&x)) return 0;
+			pos[j++]=x;
+			pos[j++]=')';
+		}
+		else if(inf[i]==']'){
+			if(!pop(&p,&x)) return 0;
+			pos[j++]=x;
+			pos[j++]=']';
+		}
+		else if(inf[i]=='}'){
+			if(!pop(&p,&x)) return 0;
+			pos[j++]=x;
+			pos[j++]='}';
+		}
+		else if(inf[i]=='+' || inf[i]=='-' || inf[i]=='*' || inf[i]=='/'){
+			push(&p,inf[i]);		
+		}
+		else{
+			pos[j++]=inf[i];
+		}
+	}
+	pos[j]='\0';
+	return 1;
 }
