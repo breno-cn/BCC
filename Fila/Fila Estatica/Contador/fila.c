@@ -39,8 +39,8 @@ int remove_ini(fila f, int *x){
 int imp_fila(fila f){
 	if(fila_vazia(f) || f==NULL) return 0;
 	printf("( ");
-	for(int aux=f->ini;aux!=(f->ini+f->cont)%MAX;aux=(aux+1)%MAX)
-		printf("%d ", f->info[aux]);
+	for(int i=f->ini;i!=(f->ini+f->cont)%MAX;i=(i+1)%MAX)
+		printf("%d ", f->info[i]);
 	printf(")\n");
 	return 1;
 }
