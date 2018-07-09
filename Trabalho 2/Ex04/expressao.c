@@ -102,12 +102,12 @@ int resultado_pos(const char *s, int *lit){
 	if(op=='^') x=pow(num1,num2);
 	while(!fila_vazia(sinal)){
 		remove_ini(sinal,&op);
-		pop(&p,&num1);
+		if(!pop(&p,&num1)) break;
 		if(op=='+') x+=num1;
 		if(op=='-') x = (x>num1) ? num1-x : x-num1;
 		if(op=='*') x*=num1;
 		if(op=='/') x/=num1;
-		if(op=='^') x=pow(x,num1);
+		if(op=='^') x=pow(num1,x);
 	}
 	return x;
 }
