@@ -5,3 +5,7 @@ void libera_grafo(Grafo* gr);
 int insere_grafo(Grafo* gr, char* origem, char* destino);
 int remove_grafo(Grafo* gr, char* origem, char* destino);
 int printa_porco(Grafo* gr);
+void menor_caminho(Grafo* gr, char* origem, char* destino);
+void busca_grafo(Grafo* gr);
+void busca_profundidade(Grafo* gr, int i, int* count, int* anterior);
+int grafo_vazio(Grafo* gr);

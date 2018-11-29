@@ -60,7 +60,6 @@ int insere_palavra(Hash* h, char* palavra)
 
     int pos = calcula_posicao(palavra, h->TABLE_SIZE);// % h->TABLE_SIZE;
     //printf("%d\n", pos);
-
     struct string* novo = (struct string*) malloc(sizeof(struct string));
     if(novo == NULL) return 0;
 

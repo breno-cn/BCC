@@ -5,59 +5,73 @@
 #include "Hash.h"
 #include "Arquivo.h"
 
-void remove_sub(char* string, char* sub)
+/*Grafo* ler_arquivo(FILE* entrada)
 {
-    char* match;
-    int len = strlen(sub);
-    while(match = strstr(string, sub))
+    int i = 0;
+    char palavra[50];
+    char frase[5000];
+    Grafo* g = cria_grafo(1007);
+    int control;
+    char palavras[5000][50];
+    while(1)
     {
-        *match = '\0';
-        strcat(string, match + len);
+        if(feof(entrada)) break;
+        fgets(frase, 5000, entrada);
+        //palavras[i] = strtok(frase, " ");
+        strcpy(palavra, strtok(frase, " "));
+        strcpy(palavras[i],palavra);
+        control = 0;
+        while(1)
+        {
+            if(control)
+            {
+                //palavra = strtok(NULL, " ");
+                strcpy(palavra, strtok(NULL, " "));
+                if(palavra == NULL) break;
+                strcpy(palavras[i],palavra);
+
+                //palavra= strtok(NULL, " ");
+                strcpy(palavra, strtok(NULL, " "));
+                if(palavra == NULL) break;
+                strcpy(palavras[i],palavra);
+            }
+            else
+            {
+                //palavra = strtok(NULL, " ");
+                strcpy(palavra, strtok(NULL, " "));
+                if(palavra==NULL) break;
+                strcpy(palavras[i],palavra);
+            }
+            control++;
+            i++;
+        }
     }
-}
+    return g;
+}*/
 
 Grafo* ler_arquivo(FILE* entrada)
 {
-    int x = 0;
-    printf("%d\n", x++);
-    Grafo* g = cria_grafo(10007);
-    printf("%d\n", x++);
+    if(entrada == NULL) return NULL;
+
     char frase[500];
-    char* origem;
-    char* destino;
-    printf("%d\n", x++);
-    int y = 0;
+    char origem[50];
+    char destino[50];
+    char* aux;
+    Grafo* g = cria_grafo(16057);
 
     while(1)
     {
-        printf("%d\n", x++);
         if(feof(entrada)) break;
+
         fgets(frase, 500, entrada);
+        strcpy(origem, strtok(frase, " "));
+
         while(1)
         {
-            /*printf("Y = %d\n", y++);
-
-            origem = strtok(frase, " ");
-            if(origem == NULL) break;
-            printf("%s\n", origem);
-
-            destino = strtok(frase, " ");
-            if(destino == NULL) break;
-            printf("%s\n", destino);
-            */
-
-            origem = strtok(frase, " ");
-            if(origem == NULL) break;
-            printf("%s\n", origem);
-            remove_sub(frase, origem);
-
-            destino = strtok(frase, " ");
-            if(destino == NULL) break;
-            printf("%s\n", destino);
-
+            aux = strtok(NULL, " ");
+            if(aux == NULL) break;
+            strcpy(destino, aux);
             insere_grafo(g, origem, destino);
-
-            printf("Y = %d\n", y++);
         }
     }
     return g;
