@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "grafo.h"
 #include "Hash.h"
-
-//#define MAX 10057
 
 struct no
 {
@@ -13,8 +12,6 @@ struct no
     struct string** arestas;
     int** peso;
     int* grau;
-    int* n_palavras;
-    int num_palavras;
 };
 
 Grafo* cria_grafo(int nro_vertices, int grau_max)
@@ -23,7 +20,6 @@ Grafo* cria_grafo(int nro_vertices, int grau_max)
     if(gr != NULL)
     {
         int i;
-        gr->num_palavras = 0;
         gr->nro_vertices = nro_vertices;
         gr->grau_max = grau_max;
         gr->grau = (int*) calloc(nro_vertices, sizeof(int));
@@ -35,10 +31,6 @@ Grafo* cria_grafo(int nro_vertices, int grau_max)
 
         for(i = 0; i < nro_vertices; i++)
             gr->peso[i] = (int*) malloc(grau_max * sizeof(int));
-
-        gr->n_palavras = (int*) malloc(nro_vertices * sizeof(int));
-        for(i = 0; i < nro_vertices; i++)
-            gr->n_palavras[i] = 0;
     }
 
     return gr;
@@ -59,7 +51,6 @@ void libera_grafo(Grafo* gr)
         free(gr->peso);
     }
     free(gr->grau);
-    free(gr->n_palavras);
     free(gr);
 }
 
@@ -84,50 +75,16 @@ int insere_aresta(Grafo* gr, char* origem, char* destino)
 
     gr->grau[pos1]++;
 
-    gr->n_palavras[pos1]++;
-    gr->n_palavras[pos2]++;
-
-    gr->num_palavras += 2;
-
     return 1;
 }
 
-void buscaProfundidade(Grafo* gr, char* ini, int* visitado, int cont)
+void buscaLargura_grafo(Grafo* gr, FILE* saida, char* ini, int* visitado)
 {
-    printf("%s\n", ini);
-    int i;
-    int x = 0;
-    int aux = calcula_posicao(ini, MAX);
-
-    visitado[aux] = cont;
-
-    for(i = 0; i < gr->grau[aux]; i++)
-    {
-        printf("%s\n", gr->arestas[aux][i].palavra);
-        aux = calcula_posicao(gr->arestas[aux][i].palavra, MAX);
-        if(visitado[aux] == 0)
-        {
-            buscaProfundidade(gr, gr->arestas[aux][i+1].palavra, visitado, cont + 1);
-        }
-    }
-    printf("AAA\n");
-}
-
-void buscaProfundidade_Grafo(Grafo* gr, char* ini, int* visitado)
-{
-    int i;
-    int cont = 1;
-
-    for(i = 0; i < gr->nro_vertices; i++)
-        visitado[i] = 0;
-
-    buscaProfundidade(gr, ini, visitado, cont);
-}
-
-void buscaLargura_Grafo(Grafo* gr, char* ini, int* visitado)
-{
+    fprintf(saida, "%s ", ini);
     int i, vert, NV, cont = 1, *fila, IF = 0, FF = 0;
     int pos = calcula_posicao(ini, MAX);
+    char palavra[50];
+    char aux;
 
     for(i = 0; i < gr->nro_vertices; i++)
         visitado[i] = 0;
@@ -147,19 +104,21 @@ void buscaLargura_Grafo(Grafo* gr, char* ini, int* visitado)
             if(!visitado[calcula_posicao(gr->arestas[vert][i].palavra, MAX)])
             {
                 FF = (FF + 1) % NV;
-                //fila[FF] = gr->arestas[vert][i];
-                printf("%s ", gr->arestas[vert][i].palavra);
+                strcpy(palavra, gr->arestas[vert][i].palavra);
+                aux = palavra[strlen(palavra) - 1];
+                //printf("%s ", palavra);
+                fprintf(saida, "%s ", palavra);
+                if(aux == '.' || aux == '!' || aux == '?' || aux == '-')
+                {
+                    free(fila);
+                    return;
+                }
+
+
                 fila[FF] = calcula_posicao(gr->arestas[vert][i].palavra, MAX);
                 visitado[calcula_posicao(gr->arestas[vert][i].palavra, MAX)] = cont;
-                gr->num_palavras -= 2;
-                if(gr->num_palavras == 0) return;
             }
         }
     }
     free(fila);
-}
-
-int grafo_vazio(Grafo* gr)
-{
-    return (gr->num_palavras == 0);
 }
