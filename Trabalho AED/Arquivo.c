@@ -5,74 +5,48 @@
 #include "Hash.h"
 #include "Arquivo.h"
 
-/*Grafo* ler_arquivo(FILE* entrada)
-{
-    int i = 0;
-    char palavra[50];
-    char frase[5000];
-    Grafo* g = cria_grafo(1007);
-    int control;
-    char palavras[5000][50];
-    while(1)
-    {
-        if(feof(entrada)) break;
-        fgets(frase, 5000, entrada);
-        //palavras[i] = strtok(frase, " ");
-        strcpy(palavra, strtok(frase, " "));
-        strcpy(palavras[i],palavra);
-        control = 0;
-        while(1)
-        {
-            if(control)
-            {
-                //palavra = strtok(NULL, " ");
-                strcpy(palavra, strtok(NULL, " "));
-                if(palavra == NULL) break;
-                strcpy(palavras[i],palavra);
-
-                //palavra= strtok(NULL, " ");
-                strcpy(palavra, strtok(NULL, " "));
-                if(palavra == NULL) break;
-                strcpy(palavras[i],palavra);
-            }
-            else
-            {
-                //palavra = strtok(NULL, " ");
-                strcpy(palavra, strtok(NULL, " "));
-                if(palavra==NULL) break;
-                strcpy(palavras[i],palavra);
-            }
-            control++;
-            i++;
-        }
-    }
-    return g;
-}*/
+//#define MAX 100057
+#define MAXF 1000
+#define CONT 500
 
 Grafo* ler_arquivo(FILE* entrada)
 {
-    if(entrada == NULL) return NULL;
+    int cont = 0;
+    char frases[MAXF][CONT];
+    char palavras[5000][CONT];
+    int n = 0;
+    char origem[CONT];
+    char destino[CONT];
+    char aux[CONT];
+    char* temp;
+    Grafo* gr = cria_grafo(MAX, MAX);
 
-    char frase[500];
-    char origem[50];
-    char destino[50];
-    char* aux;
-    Grafo* g = cria_grafo(16057);
+    for(cont = 0; fgets(frases[cont], CONT, entrada) != NULL; cont++);
 
-    while(1)
+    for(int i = 0; i < cont; i++)
     {
-        if(feof(entrada)) break;
+        temp = strtok(frases[i], " ");
+        if(temp == NULL) break;
+        else strcpy(aux, temp);
 
-        fgets(frase, 500, entrada);
-        strcpy(origem, strtok(frase, " "));
+        //printf("%s ", aux);
+        strcpy(palavras[n], aux);
+        n++;
 
         while(1)
         {
-            aux = strtok(NULL, " ");
-            if(aux == NULL) break;
-            strcpy(destino, aux);
-            insere_grafo(g, origem, destino);
+            temp = strtok(NULL, " ");
+            if(temp == NULL) break;
+            else strcpy(aux, temp);
+
+            //printf("%s ", aux);
+            strcpy(palavras[n], aux);
+            n++;
         }
     }
-    return g;
+
+    for(int i = 0; i < n - 1; i++)
+        insere_aresta(gr, palavras[i], palavras[i + 1]);
+
+    return gr;
 }

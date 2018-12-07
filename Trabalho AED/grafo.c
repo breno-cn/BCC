@@ -4,164 +4,162 @@
 #include "grafo.h"
 #include "Hash.h"
 
-struct grafo
+//#define MAX 10057
+
+struct no
 {
-    int matriz[16057][16057];
-    int qnt;
-    Hash* h;
+    int nro_vertices;
+    int grau_max;
+    struct string** arestas;
+    int** peso;
+    int* grau;
+    int* n_palavras;
+    int num_palavras;
 };
 
-Grafo* cria_grafo(int TAM)
+Grafo* cria_grafo(int nro_vertices, int grau_max)
 {
-    Grafo* gr = (Grafo*) malloc(sizeof(Grafo));
-    Hash* h = cria_hash(TAM);
-    gr->qnt = TAM;
-    /*
-    gr->matriz = (int**) malloc(TAM*sizeof(int*));
-    for(int i=0;i<TAM;i++)
-    	gr->matriz[i] = (int*) malloc(TAM * sizeof(int));
-    */
-    inicializa_grafo(gr);
-    gr->h = h;
-    return gr;
-}
+    Grafo* gr = (Grafo*) malloc(sizeof(struct no));
+    if(gr != NULL)
+    {
+        int i;
+        gr->num_palavras = 0;
+        gr->nro_vertices = nro_vertices;
+        gr->grau_max = grau_max;
+        gr->grau = (int*) calloc(nro_vertices, sizeof(int));
+        gr->arestas = (struct string**) malloc(grau_max * sizeof(struct string*));
+        for(i = 0; i < nro_vertices; i++)
+            gr->arestas[i] = (struct string*) malloc(grau_max * sizeof(struct string));
 
-void inicializa_grafo(Grafo* gr)
-{
-    if(gr==NULL) return;
-    int i,j;
-    for(i=0;i<gr->qnt;i++)
-        for(j=0;j<gr->qnt;j++)
-            gr->matriz[i][j]=0;
+        gr->peso = (int**) malloc(nro_vertices * sizeof(int*));
+
+        for(i = 0; i < nro_vertices; i++)
+            gr->peso[i] = (int*) malloc(grau_max * sizeof(int));
+
+        gr->n_palavras = (int*) malloc(nro_vertices * sizeof(int));
+        for(i = 0; i < nro_vertices; i++)
+            gr->n_palavras[i] = 0;
+    }
+
+    return gr;
 }
 
 void libera_grafo(Grafo* gr)
 {
-    if(gr !=NULL)
+    if(gr != NULL)
     {
-	libera_hash(gr->h);
-        /*
-        for(int i = 0; i < gr->qnt; i++)
-            free(gr->matriz[i]);
-        free(gr->matriz);
-        */
-	free(gr);
+        int i;
+        
+        for(i = 0; i < gr->nro_vertices; i++)
+            free(gr->arestas[i]);
+        free(gr->arestas);
+
+        for(i = 0; i < gr->nro_vertices; i++)
+            free(gr->peso[i]);
+        free(gr->peso);
     }
+    free(gr->grau);
+    free(gr->n_palavras);
+    free(gr);
 }
 
-int insere_grafo(Grafo* gr, char* origem, char* destino)
+int insere_aresta(Grafo* gr, char* origem, char* destino)
 {
-    if(gr==NULL) return 0;
-    insere_palavra(gr->h, origem);
-    insere_palavra(gr->h, destino);
-    int i = calcula_posicao(origem, getTABLE_SIZE(gr->h));
-    int j = calcula_posicao(destino, getTABLE_SIZE(gr->h));
-    gr->matriz[i][j]++;
+    if(gr == NULL) return 0;
+
+    if(origem == NULL || destino == NULL) return 0;
+    
+    int pos1 = calcula_posicao(origem, MAX);
+    int pos2 = calcula_posicao(destino, MAX);
+
+    struct string* orig = (struct string*) malloc(sizeof(struct string));
+    strcpy(orig->palavra, origem);
+
+    struct string* dest = (struct string*) malloc(sizeof(struct string));
+    strcpy(dest->palavra, destino);
+
+    gr->arestas[pos1][gr->grau[pos1]] = *dest;
+
+    gr->peso[pos1][gr->grau[pos1]]++;
+
+    gr->grau[pos1]++;
+
+    gr->n_palavras[pos1]++;
+    gr->n_palavras[pos2]++;
+
+    gr->num_palavras += 2;
+
     return 1;
 }
 
-int remove_grafo(Grafo* gr, char* origem, char* destino)
+void buscaProfundidade(Grafo* gr, char* ini, int* visitado, int cont)
 {
-    if(gr==NULL) return 0;
-    int i = calcula_posicao(origem, getTABLE_SIZE(gr->h));
-    int j = calcula_posicao(destino, getTABLE_SIZE(gr->h));
-    if(gr->matriz[i][j])
-    {//verifica se existe uma ligacao nesta posicao
-    	remove_palavra(gr->h,origem);
-	remove_palavra(gr->h,destino);
-	gr->matriz[i][j]--;
-    }
-    return 1;
-}
-
-int printa_porco(Grafo* gr)
-{
-    int i, j;
-    for(i = 0; i < gr->qnt; i++)
-    {
-	for(j = 0; j < gr->qnt; j++)
-        {
-            if(gr->matriz[i][j] != 0)
-            {
-	    printf("A  %s\n", retorna_palavra(gr->h, i));
-	    printf("B  %s\n", retorna_palavra(gr->h, j));
-	    }
-        }   
-    }
-}
-
-/*void menor_caminho(Grafo* gr, char* origem, char* destino)
-{
-    int P[gr->qnt][gr->qnt];
-    int i, j, k;
-
-    for(i = 0; i < gr->qnt; i++)
-        for(j = 0; j < gr->qnt; j++)
-            P[i][j] = gr->matriz[i][j];
-
-    int pos1 = calcula_posicao(origem, 1007);
-    int pos2 = calcula_posicao(destino, 1007);
-
-    for(j = pos1; j < gr->qnt; j++)
-    {
-        for(i = pos2; i < gr->qnt; i++)
-        {
-            if(P[i][j] > 0)
-            {
-                for(k = 0; k < gr->qnt; k++)
-                {
-                    P[j][k] = (P[i][k] > 0 || P[i][k] > 0);
-                }
-            }
-        }
-    }
-
-    for(i = 0; i < gr->qnt; i++)
-        for(j = 0; j < gr->qnt; j++)
-            if(P[i][j]) printf("%s -> %s\n", retorna_palavra(gr->h, i), retorna_palavra(gr->h, j));
-}*/
-
-void busca_grafo(Grafo* gr)
-{
-    int count = 0;
-    int anterior[1007];
+    printf("%s\n", ini);
     int i;
+    int x = 0;
+    int aux = calcula_posicao(ini, MAX);
 
-    for(i = 0; i <gr->qnt; i++)
-        anterior[i] = -1;
+    visitado[aux] = cont;
 
-    for(i = 0; i < gr->qnt; i++)
-        if(anterior[i] == -1) busca_profundidade(gr, i, &count, anterior);
-}
-
-void busca_profundidade(Grafo* gr, int i, int* count, int* anterior)
-{
-    char* palavra1;
-    char* palavra2;
-    anterior[i] = *(count)++;
-    for(int j = 0; j < gr->qnt; j++)
+    for(i = 0; i < gr->grau[aux]; i++)
     {
-        if(gr->matriz[i][j] != 0 && anterior[j] == -1)
+        printf("%s\n", gr->arestas[aux][i].palavra);
+        aux = calcula_posicao(gr->arestas[aux][i].palavra, MAX);
+        if(visitado[aux] == 0)
         {
-//            printf("%s \t->\t\t %s\n", retorna_palavra(gr->h, i), retorna_palavra(gr->h, j));
-            palavra1 = retorna_palavra(gr->h, i);
-            palavra2 = retorna_palavra(gr->h, j);
-
-            if(palavra1 != NULL && palavra2 != NULL && strcmp(palavra1, palavra2) != 0)
-            {
-                printf("%s %s", palavra1, palavra2);
-                gr->matriz[i][j]--;
-            }
-            busca_profundidade(gr, j, count, anterior);
+            buscaProfundidade(gr, gr->arestas[aux][i+1].palavra, visitado, cont + 1);
         }
     }
+    printf("AAA\n");
+}
+
+void buscaProfundidade_Grafo(Grafo* gr, char* ini, int* visitado)
+{
+    int i;
+    int cont = 1;
+
+    for(i = 0; i < gr->nro_vertices; i++)
+        visitado[i] = 0;
+
+    buscaProfundidade(gr, ini, visitado, cont);
+}
+
+void buscaLargura_Grafo(Grafo* gr, char* ini, int* visitado)
+{
+    int i, vert, NV, cont = 1, *fila, IF = 0, FF = 0;
+    int pos = calcula_posicao(ini, MAX);
+
+    for(i = 0; i < gr->nro_vertices; i++)
+        visitado[i] = 0;
+
+    NV = gr->nro_vertices;
+    fila = (int*) malloc(NV * sizeof(int));
+    FF++;
+    fila[FF] = pos;
+    visitado[pos] = cont;
+    while(IF != FF)
+    {
+        IF = (IF + 1) % NV;
+        vert = fila[IF];
+        cont++;
+        for(i = 0; i < gr->grau[vert]; i++)
+        {
+            if(!visitado[calcula_posicao(gr->arestas[vert][i].palavra, MAX)])
+            {
+                FF = (FF + 1) % NV;
+                //fila[FF] = gr->arestas[vert][i];
+                printf("%s ", gr->arestas[vert][i].palavra);
+                fila[FF] = calcula_posicao(gr->arestas[vert][i].palavra, MAX);
+                visitado[calcula_posicao(gr->arestas[vert][i].palavra, MAX)] = cont;
+                gr->num_palavras -= 2;
+                if(gr->num_palavras == 0) return;
+            }
+        }
+    }
+    free(fila);
 }
 
 int grafo_vazio(Grafo* gr)
 {
-    if(gr == NULL) return 0;
-    for(int i = 0; i < gr->qnt; i++)
-        for(int j = 0; j < gr->qnt; j++)
-            if(gr->matriz[i][j] != 0) return 0;
-    return 1;
+    return (gr->num_palavras == 0);
 }

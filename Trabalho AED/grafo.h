@@ -1,11 +1,19 @@
-typedef struct grafo Grafo;
-Grafo* cria_grafo(int TAM);
-void inicializa_grafo(Grafo* gr);
+#define MAX 10057
+
+typedef struct no Grafo;
+
+struct string
+{
+    char palavra[30];
+    int n_letras;
+};
+
+typedef struct string String;
+
+Grafo* cria_grafo(int nro_vertices, int grau_max);
 void libera_grafo(Grafo* gr);
-int insere_grafo(Grafo* gr, char* origem, char* destino);
-int remove_grafo(Grafo* gr, char* origem, char* destino);
-int printa_porco(Grafo* gr);
-void menor_caminho(Grafo* gr, char* origem, char* destino);
-void busca_grafo(Grafo* gr);
-void busca_profundidade(Grafo* gr, int i, int* count, int* anterior);
+int insere_aresta(Grafo* gr, char* origem, char* destino);
+void buscaProfundidade(Grafo* gr, char* ini, int* visitado, int cont);
+void buscaProfundidade_Grafo(Grafo* gr, char* ini, int* visitado);
+void buscaLargura_Grafo(Grafo* gr, char* ini, int* visitado);
 int grafo_vazio(Grafo* gr);
